@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11101b">
+  <meta name="description" content="Una sorpresa de cumpleaños interactiva.">
+  <title>Una sorpresa para ti</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="scene" id="scene" aria-label="Sorpresa de cumpleaños interactiva">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="room-glow" aria-hidden="true"></div>
+
+    <section class="birthday" id="birthday" aria-label="Torta de cumpleaños">
+      <div class="cake-wrap" id="cakeWrap">
+        <div class="cake" id="cake" role="img" aria-label="Pastel con 20 velas encendidas">
+          <div class="candles" id="candles" aria-hidden="true"></div>
+          <div class="cake-top"></div>
+          <div class="cake-body"><span class="icing icing-top"></span><span class="icing icing-bottom"></span>
+            <span class="sprinkles" aria-hidden="true"></span>
+          </div>
+          <div class="cake-plate"></div>
+        </div>
+      </div>
+      <div class="table" aria-hidden="true"></div>
+      <div class="table-front" aria-hidden="true"></div>
+    </section>
+
+    <section class="reveal" id="reveal" aria-label="Tu felicitación">
+      <div class="memory-card" id="memoryCard">
+        <div class="photo-frame">
+          <!-- Cambia mi-foto.jpg por el nombre/ruta de tu foto local. -->
+          <img id="memoryPhoto" src="mi-foto.jpg" alt="Un recuerdo especial">
+          <canvas id="photoCanvas" aria-hidden="true"></canvas>
+        </div>
+      </div>
+
+      <button class="scroll" id="scroll" type="button" aria-expanded="false" aria-controls="letterContent" aria-label="Abrir la carta de cumpleaños">
+        <span class="scroll-roll roll-left"></span><span class="scroll-paper"></span><span class="scroll-roll roll-right"></span>
+        <span class="ribbon" aria-hidden="true"><i></i><b></b><i></i></span>
+        <span class="letter-content" id="letterContent">
+          <!-- Escribe tu mensaje de cumpleaños dentro de este contenedor. -->
+          <div class="letter-message" contenteditable="true" aria-label="Escribe aquí tu mensaje de cumpleaños"></div>
+        </span>
+      </button>
+    </section>
+
+    <div class="wind" id="wind" aria-hidden="true"></div>
+    <div class="darkness" id="darkness" aria-hidden="true"></div>
+  </main>
+
+  <!-- Opcional: coloca estos MP3 junto al HTML o cambia las rutas. Sin archivos, hay un sonido Web Audio de respaldo. -->
+  <audio id="windAudio" src="viento.mp3" preload="none"></audio>
+  <audio id="hoverAudio" src="hover.mp3" preload="none"></audio>
+  <audio id="paperAudio" src="carta.mp3" preload="none"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
