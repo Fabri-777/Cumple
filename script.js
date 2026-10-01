@@ -1,4 +1,4 @@
-/* Personaliza las rutas mi-foto.jpg, viento.mp3, hover.mp3 y carta.mp3 en index.html. */
+/* Personaliza la ruta mi-foto.png y los audios viento.mp3, hover.mp3 y carta.mp3 en index.html. */
 const scene = document.querySelector('#scene');
 const candleHost = document.querySelector('#candles');
 const wind = document.querySelector('#wind');
@@ -80,8 +80,8 @@ function blowCandles() {
   }, 2000);
 }
 
-// Lienzo de partículas que se reúnen para revelar mi-foto.jpg. Si falta la imagen,
-// se conserva una tarjeta vacía con la ruta visible para que sepas dónde ponerla.
+// Fuegos artificiales de partículas con los colores de mi-foto.png; al terminar,
+// las partículas forman la imagen y permanecen en el lienzo.
 function buildPhoto() {
   const context = photoCanvas.getContext('2d', { willReadFrequently: true });
   const bounds = photoCanvas.getBoundingClientRect();
@@ -104,27 +104,63 @@ function buildPhoto() {
   const pixels = sampleCtx.getImageData(0, 0, width, height).data;
   const points = [];
   const gap = Math.max(2, Math.round(width / 75));
+  const bursts = Array.from({ length: 6 }, (_, index) => ({
+    x: bounds.width * (0.06 + index * 0.176),
+    y: bounds.height * (0.25 + Math.random() * 0.18),
+  }));
   for (let y = 0; y < height; y += gap) for (let x = 0; x < width; x += gap) {
     const index = (y * width + x) * 4;
-    points.push({ x: x * bounds.width / width, y: y * bounds.height / height, color: `rgba(${pixels[index]},${pixels[index + 1]},${pixels[index + 2]},${pixels[index + 3] / 255})`, delay: Math.random() * 650 });
+    const targetX = x * bounds.width / width;
+    const targetY = y * bounds.height / height;
+    const burst = bursts[Math.min(bursts.length - 1, Math.floor((x / width) * bursts.length))];
+    const radius = 24 + Math.random() * Math.min(bounds.width, bounds.height) * 0.18;
+    const angle = Math.random() * Math.PI * 2;
+    points.push({
+      x: targetX, y: targetY,
+      color: `rgba(${pixels[index]},${pixels[index + 1]},${pixels[index + 2]},${pixels[index + 3] / 255})`,
+      launchX: burst.x + (Math.random() - 0.5) * 12,
+      launchY: bounds.height + Math.random() * 18,
+      burstX: burst.x, burstY: burst.y,
+      sparkX: targetX + Math.cos(angle) * radius,
+      sparkY: targetY + Math.sin(angle) * radius,
+      delay: Math.random() * 450,
+    });
   }
   const start = performance.now();
   function draw(now) {
     context.clearRect(0, 0, bounds.width, bounds.height);
     let active = false;
     for (const point of points) {
-      const progress = Math.max(0, Math.min(1, (now - start - point.delay) / 850));
+      const progress = Math.max(0, Math.min(1, (now - start - point.delay) / 1750));
       if (progress < 1) active = true;
-      const eased = 1 - (1 - progress) ** 3;
-      const x = point.x + (bounds.width * .5 - point.x) * (1 - eased);
-      const y = point.y + (bounds.height * .5 - point.y) * (1 - eased);
-      context.globalAlpha = progress;
+      let x; let y;
+      if (progress < 0.24) {
+        const flight = progress / 0.24;
+        const eased = 1 - (1 - flight) ** 3;
+        x = point.launchX + (point.burstX - point.launchX) * eased;
+        y = point.launchY + (point.burstY - point.launchY) * eased;
+      } else if (progress < 0.7) {
+        const burst = (progress - 0.24) / 0.46;
+        const eased = 1 - (1 - burst) ** 2;
+        x = point.burstX + (point.sparkX - point.burstX) * eased;
+        y = point.burstY + (point.sparkY - point.burstY) * eased;
+      } else {
+        const gather = (progress - 0.7) / 0.3;
+        const eased = 1 - (1 - gather) ** 3;
+        x = point.sparkX + (point.x - point.sparkX) * eased;
+        y = point.sparkY + (point.y - point.sparkY) * eased;
+      }
+      context.globalAlpha = Math.min(1, 0.32 + progress * 1.2);
       context.fillStyle = point.color;
-      context.beginPath(); context.arc(x, y, Math.max(1, gap * .55 * (0.45 + eased * .55)), 0, Math.PI * 2); context.fill();
+      context.shadowBlur = progress < 0.7 ? 5 : 1;
+      context.shadowColor = point.color;
+      const particleSize = Math.max(1, gap * (progress < 0.7 ? 0.72 : 0.5));
+      context.beginPath(); context.arc(x, y, particleSize, 0, Math.PI * 2); context.fill();
     }
     context.globalAlpha = 1;
+    context.shadowBlur = 0;
     if (active) requestAnimationFrame(draw);
-    else window.setTimeout(() => { photoCanvas.style.opacity = '0'; }, 180);
+    // No se borra ni se desvanece al acabar: la imagen queda formada en el canvas.
   }
   photoCanvas.style.opacity = '1'; requestAnimationFrame(draw);
 }
