@@ -79,6 +79,7 @@
     <div class="shooting-star" aria-hidden="true"><i></i></div>
     <div class="heartbeat" aria-hidden="true"></div>
     <div class="celebration" id="celebration" aria-hidden="true"></div>
+    <button class="rain-toggle" id="rainToggle" type="button" aria-label="Activar sonido de lluvia" title="Activar lluvia">♪</button>
     <button class="replay" id="replay" type="button" aria-label="Repetir la sorpresa" title="Repetir">↻</button>
   </main>
 
@@ -86,6 +87,8 @@
   <audio id="windAudio" src="viento.mp3" preload="none"></audio>
   <audio id="hoverAudio" src="hover.mp3" preload="none"></audio>
   <audio id="paperAudio" src="carta.mp3" preload="none"></audio>
+  <!-- Añade lluvia.mp3 a esta misma carpeta para el ambiente de lluvia inicial. -->
+  <audio id="rainAudio" src="lluvia.mp3" preload="auto" loop></audio>
   <script src="script.js"></script>
 </body>
 </html>

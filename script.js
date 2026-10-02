@@ -8,14 +8,18 @@ const photo = document.querySelector('#memoryPhoto');
 const photoCanvas = document.querySelector('#photoCanvas');
 const celebration = document.querySelector('#celebration');
 const replay = document.querySelector('#replay');
+const rainToggle = document.querySelector('#rainToggle');
 const audio = {
   wind: document.querySelector('#windAudio'),
   hover: document.querySelector('#hoverAudio'),
   paper: document.querySelector('#paperAudio'),
+  rain: document.querySelector('#rainAudio'),
 };
 let blown = false;
 let finaleStarted = false;
 let audioContext;
+let rainFadeTimer;
+let generatedRain;
 
 // Genera exactamente 20 velas para que sea fácil cambiar el número aquí.
 const candleCount = 20;
@@ -77,10 +81,69 @@ function makeWind() {
   window.setTimeout(() => wind.replaceChildren(), 1400);
 }
 
+function markRainPlaying() {
+  rainToggle.classList.add('playing');
+  rainToggle.setAttribute('aria-label', 'Lluvia activada');
+}
+
+// Ambiente de respaldo para que la escena conserve lluvia aun sin lluvia.mp3.
+function startGeneratedRain() {
+  try {
+    audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') audioContext.resume();
+    if (generatedRain) return;
+    const length = Math.floor(audioContext.sampleRate * 2);
+    const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let index = 0; index < length; index += 1) data[index] = (Math.random() * 2 - 1) * (Math.random() > .45 ? .48 : .12);
+    const source = audioContext.createBufferSource(); source.buffer = buffer; source.loop = true;
+    const highpass = audioContext.createBiquadFilter(); highpass.type = 'highpass'; highpass.frequency.value = 760;
+    const lowpass = audioContext.createBiquadFilter(); lowpass.type = 'lowpass'; lowpass.frequency.value = 5700;
+    const gain = audioContext.createGain(); gain.gain.value = .026;
+    source.connect(highpass).connect(lowpass).connect(gain).connect(audioContext.destination);
+    source.start(); generatedRain = { source, gain };
+    markRainPlaying();
+  } catch { /* El ambiente es opcional. */ }
+}
+
+function fadeOutGeneratedRain() {
+  if (!generatedRain || !audioContext) return;
+  const { source, gain } = generatedRain;
+  const now = audioContext.currentTime;
+  gain.gain.cancelScheduledValues(now);
+  gain.gain.setValueAtTime(Math.max(.0001, gain.gain.value), now);
+  gain.gain.exponentialRampToValueAtTime(.0001, now + .75);
+  window.setTimeout(() => { source.stop(); generatedRain = undefined; }, 790);
+}
+
+function startRain() {
+  if (blown) return;
+  window.clearInterval(rainFadeTimer);
+  if (!audio.rain) { startGeneratedRain(); return; }
+  audio.rain.volume = .28;
+  const play = audio.rain.play();
+  if (play) play.then(markRainPlaying).catch(startGeneratedRain);
+}
+
+function fadeOutRain() {
+  fadeOutGeneratedRain();
+  if (!audio.rain || audio.rain.paused) return;
+  const step = .028;
+  rainFadeTimer = window.setInterval(() => {
+    audio.rain.volume = Math.max(0, audio.rain.volume - step);
+    if (audio.rain.volume <= 0) {
+      window.clearInterval(rainFadeTimer);
+      audio.rain.pause();
+      audio.rain.currentTime = 0;
+    }
+  }, 85);
+}
+
 function blowCandles() {
   if (blown) return;
   blown = true;
   scene.classList.add('blown');
+  fadeOutRain();
   makeWind();
   playSound(audio.wind, () => softTone('wind'));
   window.setTimeout(() => {
@@ -265,6 +328,11 @@ scroll.addEventListener('click', (event) => {
 });
 
 replay.addEventListener('click', () => window.location.reload());
+
+rainToggle.addEventListener('click', (event) => {
+  event.stopPropagation();
+  startRain();
+});
 
 for (const target of [document.querySelector('#cakeWrap'), scroll]) {
   target.addEventListener('pointerenter', () => {
