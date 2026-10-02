@@ -66,7 +66,7 @@ button { font:inherit; }
 .ribbon i {position:absolute;top:19px;width:35px;height:39px;border:7px solid #a93443;border-radius:50% 50% 6px 50%;transform:rotate(28deg);filter:drop-shadow(0 2px 2px #281018);}
 .ribbon i:first-child{left:1px}.ribbon i:last-child{right:1px;transform:scaleX(-1) rotate(28deg)}
 .letter-content {position:absolute;z-index:2;inset:20px 25px;display:block;overflow:auto;padding:30px 24px;color:#39291e;font:500 1rem/1.6 'Cormorant Garamond',serif;opacity:0;transform:scaleY(.86);transform-origin:top;transition:opacity .7s .4s,transform .8s .35s;scrollbar-color:#c9a475 transparent;}
-.letter-message {min-height:100%;outline:none;}
+.letter-message {min-height:100%;outline:none;}.letter-message p {margin:0 0 13px;}.letter-message p:first-child {margin-top:3px;}.letter-message p:last-child {margin:20px 0 0;text-align:right;font-style:italic;}
 .darkness {position:fixed;z-index:2;inset:0;background:#030307;opacity:0;pointer-events:none;transition:opacity 2.3s ease;}
 .wind {position:fixed;z-index:5;inset:0;pointer-events:none;overflow:hidden;}
 .wind-particle {position:absolute;width:var(--size,3px);height:var(--size,3px);left:var(--x);top:var(--y);border-radius:50%;background:#f9e8c7;box-shadow:0 0 9px #fff4d8;opacity:0;animation:gust .9s ease-out forwards;}
