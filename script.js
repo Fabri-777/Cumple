@@ -1,6 +1,7 @@
 /* Personaliza la ruta mi-foto.png y los audios viento.mp3, hover.mp3 y carta.mp3 en index.html. */
 const scene = document.querySelector('#scene');
 const candleHost = document.querySelector('#candles');
+const reflectionHost = document.querySelector('#candleReflections');
 const wind = document.querySelector('#wind');
 const scroll = document.querySelector('#scroll');
 const photo = document.querySelector('#memoryPhoto');
@@ -21,8 +22,12 @@ const candleCount = 20;
 for (let index = 0; index < candleCount; index += 1) {
   const candle = document.createElement('span');
   candle.className = 'candle';
-  candle.innerHTML = '<i class="wick"></i><i class="flame"></i>';
+  candle.innerHTML = '<i class="smoke"></i><i class="wick"></i><i class="flame"></i>';
   candleHost.append(candle);
+  const reflection = document.createElement('i');
+  reflection.className = 'candle-reflection';
+  reflection.style.animationDelay = `${-index * .12}s`;
+  reflectionHost.append(reflection);
 }
 
 function playSound(element, fallback) {
