@@ -12,6 +12,21 @@
   <main class="scene" id="scene" aria-label="Sorpresa de cumpleaños interactiva">
     <div class="stars" aria-hidden="true"></div>
     <div class="room-glow" aria-hidden="true"></div>
+    <div class="cosmos" aria-hidden="true">
+      <div class="nebula nebula-one"></div>
+      <div class="nebula nebula-two"></div>
+      <div class="galaxy galaxy-one"></div>
+      <div class="galaxy galaxy-two"></div>
+      <div class="starfield starfield-near"></div>
+      <div class="starfield starfield-far"></div>
+      <svg class="constellation" viewBox="0 0 440 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="constellation-line" d="M32 34L83 14L139 28L156 64L121 92L61 136L35 166L162 166M255 18L326 15L382 48L397 108L373 159L307 176L255 148L237 91L255 18" />
+        <g class="constellation-stars">
+          <circle cx="32" cy="34" r="4"/><circle cx="83" cy="14" r="3"/><circle cx="139" cy="28" r="4"/><circle cx="156" cy="64" r="3"/><circle cx="121" cy="92" r="4"/><circle cx="61" cy="136" r="3"/><circle cx="35" cy="166" r="4"/><circle cx="162" cy="166" r="4"/>
+          <circle cx="255" cy="18" r="4"/><circle cx="326" cy="15" r="3"/><circle cx="382" cy="48" r="4"/><circle cx="397" cy="108" r="3"/><circle cx="373" cy="159" r="4"/><circle cx="307" cy="176" r="4"/><circle cx="255" cy="148" r="3"/><circle cx="237" cy="91" r="4"/>
+        </g>
+      </svg>
+    </div>
 
     <section class="birthday" id="birthday" aria-label="Torta de cumpleaños">
       <div class="cake-wrap" id="cakeWrap">
@@ -49,6 +64,8 @@
 
     <div class="wind" id="wind" aria-hidden="true"></div>
     <div class="darkness" id="darkness" aria-hidden="true"></div>
+    <div class="celebration" id="celebration" aria-hidden="true"></div>
+    <button class="replay" id="replay" type="button" aria-label="Repetir la sorpresa" title="Repetir">↻</button>
   </main>
 
   <!-- Opcional: coloca estos MP3 junto al HTML o cambia las rutas. Sin archivos, hay un sonido Web Audio de respaldo. -->

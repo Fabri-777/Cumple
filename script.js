@@ -5,12 +5,15 @@ const wind = document.querySelector('#wind');
 const scroll = document.querySelector('#scroll');
 const photo = document.querySelector('#memoryPhoto');
 const photoCanvas = document.querySelector('#photoCanvas');
+const celebration = document.querySelector('#celebration');
+const replay = document.querySelector('#replay');
 const audio = {
   wind: document.querySelector('#windAudio'),
   hover: document.querySelector('#hoverAudio'),
   paper: document.querySelector('#paperAudio'),
 };
 let blown = false;
+let finaleStarted = false;
 let audioContext;
 
 // Genera exactamente 20 velas para que sea fácil cambiar el número aquí.
@@ -165,6 +168,81 @@ function buildPhoto() {
   photoCanvas.style.opacity = '1'; requestAnimationFrame(draw);
 }
 
+function fireworkPalette() {
+  const fallback = ['#aac6ff', '#d9e6ff', '#efb6a8', '#7289ba', '#e8d6bd'];
+  if (!photo.complete || !photo.naturalWidth) return fallback;
+  const sampler = document.createElement('canvas');
+  sampler.width = 7; sampler.height = 7;
+  const samplerContext = sampler.getContext('2d', { willReadFrequently: true });
+  samplerContext.drawImage(photo, 0, 0, sampler.width, sampler.height);
+  const pixels = samplerContext.getImageData(0, 0, sampler.width, sampler.height).data;
+  const palette = [];
+  for (let pixel = 0; pixel < pixels.length; pixel += 16) {
+    let red = pixels[pixel]; let green = pixels[pixel + 1]; let blue = pixels[pixel + 2];
+    if (red + green + blue < 115) { red += 70; green += 82; blue += 115; }
+    palette.push(`rgb(${Math.min(255, red)}, ${Math.min(255, green)}, ${Math.min(255, blue)})`);
+  }
+  return palette.length ? palette : fallback;
+}
+
+function launchFirework(color, index) {
+  const firework = document.createElement('div');
+  firework.className = 'firework';
+  firework.style.setProperty('--x', `${8 + Math.random() * 84}%`);
+  firework.style.setProperty('--y', `${7 + Math.random() * 42}%`);
+  firework.style.setProperty('--color', color);
+  firework.style.setProperty('--delay', `${index * 170 + Math.random() * 220}ms`);
+  firework.innerHTML = '<i class="rocket"></i>';
+  for (let spark = 0; spark < 28; spark += 1) {
+    const particle = document.createElement('i');
+    particle.className = 'firework-spark';
+    const angle = (Math.PI * 2 * spark / 28) + (Math.random() - .5) * .18;
+    const distance = 38 + Math.random() * 82;
+    particle.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+    particle.style.setProperty('--dy', `${Math.sin(angle) * distance + 22}px`);
+    firework.append(particle);
+  }
+  celebration.append(firework);
+}
+
+function launchConfetti(colors) {
+  for (let piece = 0; piece < 100; piece += 1) {
+    const confetti = document.createElement('i');
+    confetti.className = 'confetti';
+    confetti.style.setProperty('--x', `${Math.random() * 100}%`);
+    confetti.style.setProperty('--color', colors[piece % colors.length]);
+    confetti.style.setProperty('--drift', `${-150 + Math.random() * 300}px`);
+    confetti.style.setProperty('--turn', `${Math.random() * 720 - 360}deg`);
+    confetti.style.setProperty('--delay', `${Math.random() * 680}ms`);
+    confetti.style.setProperty('--duration', `${2500 + Math.random() * 1900}ms`);
+    celebration.append(confetti);
+  }
+}
+
+function launchBalloons(colors) {
+  for (let balloonNumber = 0; balloonNumber < 13; balloonNumber += 1) {
+    const balloon = document.createElement('i');
+    balloon.className = 'balloon';
+    balloon.style.setProperty('--x', `${-3 + Math.random() * 106}%`);
+    balloon.style.setProperty('--color', colors[balloonNumber % colors.length]);
+    balloon.style.setProperty('--drift', `${-90 + Math.random() * 180}px`);
+    balloon.style.setProperty('--delay', `${250 + Math.random() * 1600}ms`);
+    balloon.style.setProperty('--duration', `${5400 + Math.random() * 2300}ms`);
+    celebration.append(balloon);
+  }
+}
+
+function startFinale() {
+  if (finaleStarted) return;
+  finaleStarted = true;
+  const colors = fireworkPalette();
+  scene.classList.add('celebrating');
+  for (let firework = 0; firework < 9; firework += 1) launchFirework(colors[firework % colors.length], firework);
+  launchConfetti(colors);
+  launchBalloons(colors);
+  window.setTimeout(() => replay.classList.add('visible'), 2700);
+}
+
 document.addEventListener('click', (event) => {
   if (!blown && !scroll.contains(event.target)) blowCandles();
 }, { once: true });
@@ -176,7 +254,10 @@ scroll.addEventListener('click', (event) => {
   if (scroll.classList.contains('open')) return;
   scroll.classList.add('open'); scroll.setAttribute('aria-expanded', 'true');
   playSound(audio.paper, () => softTone('paper'));
+  window.setTimeout(startFinale, 850);
 });
+
+replay.addEventListener('click', () => window.location.reload());
 
 for (const target of [document.querySelector('#cakeWrap'), scroll]) {
   target.addEventListener('pointerenter', () => {
