@@ -253,7 +253,9 @@ scroll.addEventListener('click', (event) => {
   if (!blown) { blowCandles(); return; }
   if (scroll.classList.contains('open')) return;
   scroll.classList.add('open'); scroll.setAttribute('aria-expanded', 'true');
+  scene.classList.add('letter-open', 'heartbeating');
   playSound(audio.paper, () => softTone('paper'));
+  window.setTimeout(() => scene.classList.remove('heartbeating'), 1250);
   window.setTimeout(startFinale, 850);
 });
 
